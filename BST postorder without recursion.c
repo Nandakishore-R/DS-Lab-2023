@@ -1,5 +1,13 @@
-#include<stdio.h>
-#include<malloc.h>
+/******************************************************************************
+
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
 
 struct node
 {
@@ -8,19 +16,29 @@ struct node
     struct node *right;
 };
 
-typedef struct node tree;
-tree *root = NULL;
 
-tree *stack[20];
-int top=-1;
+typedef struct node tree;
+
+struct stack
+{
+    tree *r;
+    int count;
+    struct stack *next;
+};
+
+typedef struct stack stack;
+
+tree *root = NULL;
+stack *top = NULL;
+
 
 void insert(int e)
 {
-    tree *p,*x,*t;
+    tree *p,*x;
     if(root==NULL)
     {
-        root = (tree *)malloc(sizeof(tree));
-        root->data=e;
+        root = (tree *) malloc(sizeof(tree));
+        root->data = e;
         root->left=NULL;
         root->right=NULL;
     }
@@ -30,125 +48,140 @@ void insert(int e)
         while(p!=NULL)
         {
             x=p;
-            if(p->data > e)
-                p=p->left;
-            else if(p->data < e)
+            if(e>p->data)
                 p=p->right;
+            else if(e<p->data)
+                p=p->left;
             else
             {
-                printf("Repeated value not allowed!\n");
+                printf("\nDuplicates value not allowed\n");
                 return;
             }
         }
-        t=(tree *)malloc(sizeof(tree));
-        t->data=e;
-        t->right=NULL;
-        t->left=NULL;
-        if(x->data < e)
+        tree *t = (tree *) malloc(sizeof(tree));
+        t->data = e;
+        t->left = NULL;
+        t->right = NULL;
+        if(e>x->data)
             x->right = t;
         else
             x->left = t;
-        
     }
 }
+
+void inorder(tree *r)
+{
+    if(r!=NULL)
+    {
+        inorder(r->left);
+        printf("%d ",r->data);
+        inorder(r->right);
+    }
+}
+
+void preorder(tree *r)
+{
+    if(r!=NULL)
+    {
+        printf("%d ",r->data);
+        preorder(r->left);
+        preorder(r->right);
+    }
+}
+
 
 void postorder(tree *r)
 {
     if(r!=NULL)
     {
-		postorder(r->left);	
+        
+        postorder(r->left);
         postorder(r->right);
-        printf("%d\t",r->data);
+        printf("%d ",r->data);
     }
 }
 
-void push(tree *e)
+void push(tree *t, int c)
 {
-	if(top==19)
-	{
-		printf("Stack is full\n");
-	}
-	else
-	{
-		top++;
-		stack[top] = e;
-	}
-}
-tree * pop()
-{	
-	tree *t;
-	if(top==-1)
-	{
-		t = NULL;
-	}
-	else
-	{
-	t = stack[top--];	
-	}
-	return t;
+    stack *temp = (stack *)malloc(sizeof(stack));
+    temp->r = t;
+    temp->count = c;
+    temp->next = top;
+    top = temp;
 }
 
-tree * peek()
+tree  *pop()
 {
-	tree *t;
-	if(top==-1)
-	{
-		t = NULL;
-	}
-	else
-	{
-	t = stack[top];	
-	}
-	return t;
+    tree *t = NULL;
+    if(top != NULL)
+    {
+           t = top->r;
+           top = top->next;
+    }
+    return t;
+}
+
+int  peek()
+{
+    int c = -1;
+    if(top != NULL)
+    {
+           c = top->count;
+    }
+    return c;
 }
 
 void postorder2(tree *root)
 {
-    tree *t=root;
-    tree *temp;
-    
-    while(temp != NULL)
+    tree *t;
+    int c;
+    for(t=root;t!=NULL;t=t->left)
     {
-        if(t==NULL)
+        push(t,1);
+    }
+    c=peek();
+    t=pop();
+    while(t!=NULL)
+    {
+        if(c==1)
         {
-        	temp = peek();
-        	if (temp == NULL)
-        		continue;
-        	t = temp->right;
+            push(t,2);
+            for(t=t->right;t!=NULL;t=t->left)
+            {
+                push(t,1);
+            }
         }
-        else
+        else if (c==2)
         {
-        	if(temp == t)
-        	{
-        		printf("%d\t",temp->data);
-        		temp = pop();
-        		if (temp == NULL)
-        		continue;
-        		t = temp->right;
-			}
-			else
-			{
-				push(t);
-            t=t->left;
-			}
-            
+            printf("%d ",t->data);
         }
+        c = peek();
+        t=pop();
+        
     }
 }
 
 int main()
 {
-    insert(45);
-    insert(15);
-    insert(79);
+    insert(100);
+    insert(50);
+    insert(60);
+    insert(150);
+    insert(140);
+    insert(145);
     insert(10);
     insert(20);
-    insert(55);
-    insert(90);
-    insert(12);
-    insert(50);
-    postorder(root);
+    inorder(root);
     printf("\n");
+    // inorder2(root);
+    printf("\n");
+    preorder(root);
+    printf("\n");
+    // preorder2(root);
+    printf("\n");
+    postorder(root);
+    printf("\n\n");
     postorder2(root);
     return 0;
 }
+
