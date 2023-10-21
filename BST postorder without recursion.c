@@ -69,27 +69,6 @@ void insert(int e)
     }
 }
 
-void inorder(tree *r)
-{
-    if(r!=NULL)
-    {
-        inorder(r->left);
-        printf("%d ",r->data);
-        inorder(r->right);
-    }
-}
-
-void preorder(tree *r)
-{
-    if(r!=NULL)
-    {
-        printf("%d ",r->data);
-        preorder(r->left);
-        preorder(r->right);
-    }
-}
-
-
 void postorder(tree *r)
 {
     if(r!=NULL)
@@ -171,14 +150,6 @@ int main()
     insert(145);
     insert(10);
     insert(20);
-    inorder(root);
-    printf("\n");
-    // inorder2(root);
-    printf("\n");
-    preorder(root);
-    printf("\n");
-    // preorder2(root);
-    printf("\n");
     postorder(root);
     printf("\n\n");
     postorder2(root);
